@@ -49,6 +49,16 @@ python model/entrenar.py
 
 El script genera métricas, el artefacto `modelo.joblib` y gráficos de validación/prueba. Los datos y artefactos binarios no se versionan en este repositorio; revisar [model/SHA256.txt](model/SHA256.txt) para los hashes de los CSV originales.
 
+## Servicios locales de laboratorio
+
+El Compose de la raíz inicia RabbitMQ y Redis para pruebas locales. Copia `.env.example` a `.env`, cambia la contraseña de ejemplo y ejecuta:
+
+```bash
+docker compose up -d
+```
+
+Los puertos quedan ligados a `127.0.0.1`; no publiques estos servicios directamente en Internet. Para detenerlos: `docker compose down`.
+
 ## Ejecutar prototipo local
 
 Requiere Python 3.12, `prototype-local/modelo.joblib` y `prototype-local/ShopFast_datos.zip`:
