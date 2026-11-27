@@ -41,4 +41,26 @@ Se retiraron las contraseñas de prueba incrustadas en scripts y Compose del paq
 - No se recibió el Dockerfile original de EC2.
 - No se han repetido pruebas integradas desde cero ni comparado cada hash con el estado de procesos activos.
 
+
+
+## Reviewed hardening branch
+
+The branch `review/cloud-hardening` contains proposed corrections while the `main` branch preserves the sanitized source snapshot:
+
+- API key validation for recommendation and event routes, using constant-time comparison.
+- Four isolated unit tests for missing server configuration, missing/wrong client key, and valid key.
+- Removal of a duplicate Dashboard route decorator and handling of invalid JSON responses.
+- A direct runtime requirements file based on the versions observed in the EC2 `pip freeze`.
+
+To run the isolated tests from this directory:
+
+```bash
+python -m pip install -r requirements-test.txt
+python -m pytest tests/test_security.py
+```
+
+The API key must be configured as `SHOPFAST_API_KEY` in the server's untracked `.env` file. Do not commit that file. Keep the Dashboard and API bound to loopback and use the SSH tunnel. The Dashboard indicators endpoint still has no application-level authentication of its own.
+
+**Before deployment:** the recorded model-training dependencies and the EC2 runtime snapshot differ for NumPy, pandas and joblib. Re-load the exact model artifact and run an authorized SageMaker/API smoke test in a staging copy before applying these changes to EC2. The full integration suite was not run because model and dataset binaries are intentionally not stored in Git.
+
 Ver [auditoría de los archivos EC2](../docs/post-entrega/revision-archivos-ec2.md) y [brechas cloud pendientes](../docs/cloud-source-gap.md).
