@@ -17,8 +17,8 @@ Esta revisión se realizó sobre los snapshots sanitizados de API, Dashboard, un
 ## Contrato de autenticación propuesto
 
 - `GET /health/live`: público, para comprobación de vida del proceso.
-- `GET /v1/recommendations`: requiere `X-API-Key`.
-- `POST /v1/events`: requiere `X-API-Key`.
+- `GET /v1/recommendations`: requiere `X-API-Key` en `api.py` y `api_respaldo.py`.
+- `POST /v1/events`: requiere `X-API-Key` en `api.py` y `api_respaldo.py`.
 - La clave esperada se lee desde `SHOPFAST_API_KEY`.
 - Si el servidor no tiene la clave configurada, devuelve HTTP 503.
 - Si falta la cabecera o no coincide, devuelve HTTP 401.
@@ -29,14 +29,16 @@ La ruta `GET /api/dashboard` del Dashboard no tiene autenticación propia en el 
 
 ## Pruebas realizadas
 
-Se ejecutaron cuatro pruebas unitarias aisladas sobre el validador de clave:
+Se ejecutaron seis pruebas unitarias y de dependencia aislada sobre el validador de clave:
 
 1. Falta la clave del servidor → HTTP 503.
 2. Falta la clave del cliente → HTTP 401.
 3. La clave del cliente es incorrecta → HTTP 401.
 4. La clave coincide → validación correcta.
+5. La dependencia FastAPI rechaza una petición sin cabecera → HTTP 401.
+6. La dependencia FastAPI acepta una petición con cabecera correcta → HTTP 200.
 
-**Resultado:** 4 pruebas aprobadas en el entorno local de revisión.
+**Resultado:** 6 pruebas aprobadas en el entorno local de revisión (Python 3.13.5, FastAPI 0.128.2 y pytest 9.0.2). Esto valida el helper y la dependencia en una app FastAPI mínima; no es una prueba integrada de los módulos ShopFast en Python 3.12.3 de EC2.
 
 No se ejecutó la aplicación cloud completa ni una prueba integrada con SageMaker, Redis o RabbitMQ. Los binarios de modelo y dataset no están versionados, y no se verificó el estado actual de EC2.
 
@@ -58,6 +60,7 @@ No actualizar producción directamente desde esta rama sin completar estas compr
 
 - `cloud-source-candidate/security.py`
 - `cloud-source-candidate/api.py`
+- `cloud-source-candidate/api_respaldo.py`
 - `cloud-source-candidate/dashboard_api.py`
 - `cloud-source-candidate/env.example`
 - `cloud-source-candidate/requirements-runtime-ec2-snapshot.txt`
