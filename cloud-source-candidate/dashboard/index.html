@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopFast Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>ShopFast Analytics</h1>
+            <p>Panel de monitoreo empresarial</p>
+        </div>
+        <span class="cloud">AWS CLOUD</span>
+    </header>
+
+    <main>
+
+        <section class="bienvenida">
+            <h2>Resumen general</h2>
+            <p>Monitoreo de la arquitectura ShopFast EP3</p>
+            <button onclick="actualizarDashboard()">
+                Actualizar indicadores
+            </button>
+        </section>
+
+        <section class="indicadores">
+
+            <article class="tarjeta">
+                <h3>Eventos registrados</h3>
+                <strong id="eventos">--</strong>
+                <p>Almacenamiento en Redis</p>
+            </article>
+
+            <article class="tarjeta">
+                <h3>Estado de Redis</h3>
+                <strong id="redis">--</strong>
+                <p>Base de datos de eventos</p>
+            </article>
+
+            <article class="tarjeta">
+                <h3>Modelo configurado</h3>
+                <strong id="modelo">--</strong>
+                <p>Machine Learning</p>
+            </article>
+
+            <article class="tarjeta">
+                <h3>Entorno</h3>
+                <strong id="entorno">--</strong>
+                <p>Infraestructura AWS</p>
+            </article>
+
+        </section>
+
+        <section class="panel">
+            <h2>Información del sistema</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Componente</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dashboard</td>
+                        <td id="dashboard">--</td>
+                    </tr>
+                    <tr>
+                        <td>Redis</td>
+                        <td id="estado-redis">--</td>
+                    </tr>
+                    <tr>
+                        <td>Inventario</td>
+                        <td id="inventario">--</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+<section class="graficos">
+
+    <article class="panel">
+        <h2>Distribución de eventos</h2>
+
+        <div id="grafico-eventos">
+            Cargando datos...
+        </div>
+    </article>
+
+    <article class="panel">
+        <h2>Interacciones por producto</h2>
+
+        <div id="grafico-productos">
+            Cargando datos...
+        </div>
+    </article>
+
+</section>
+
+        <p id="actualizacion">
+            Esperando actualización...
+        <p>
+
+    
+<section class="panel" id="panel-recomendaciones">
+    <h2>Recomendaciones del modelo IA</h2>
+    <p>Resultados del motor Random Forest</p>
+
+    <p>Version: <strong id="ia-version">Pendiente</strong></p>
+    <p>Inferencia: <strong id="ia-entorno">Pendiente</strong></p>
+    <p>Fallback: <strong id="ia-fallback">Pendiente</strong></p>
+    <p>Inventario: <strong id="ia-inventario">Pendiente</strong></p>
+    <p>Recommendation ID: <span id="ia-id">--</span></p>
+
+    
+<button id="btn-recomendaciones"
+onclick="consultarRecomendaciones()">
+    Consultar recomendaciones IA
+</button>
+<div id="ia-productos">
+        Sin recomendaciones consultadas.
+    </div>
+</section>
+
+</main>
+
+    <footer>
+        ShopFast EP3 | Arquitectura de Sistemas IA
+    </footer>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
