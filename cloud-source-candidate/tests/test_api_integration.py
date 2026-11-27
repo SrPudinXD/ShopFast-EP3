@@ -26,6 +26,12 @@ def api_runtime(monkeypatch):
     monkeypatch.setitem(sys.modules, "sagemaker_cliente", sagemaker)
     monkeypatch.setitem(sys.modules, "mensajeria", messaging)
 
+    pika = types.ModuleType("pika")
+    pika.exceptions = types.SimpleNamespace(
+        AMQPError=type("AMQPError", (Exception,), {})
+    )
+    monkeypatch.setitem(sys.modules, "pika", pika)
+
     monkeypatch.setattr(
         joblib,
         "load",
