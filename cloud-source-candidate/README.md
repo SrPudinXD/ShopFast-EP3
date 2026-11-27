@@ -18,7 +18,7 @@ Esta carpeta reúne snapshots sanitizados de los fuentes entregados en `shopfast
 - `requirements-exported.txt`: dependencias incluidas en el RAR original.
 - `requirements-ec2-freeze-2026-11-27.txt`: snapshot completo de `pip freeze` del entorno virtual de EC2.
 - `requirements-runtime-ec2-snapshot.txt`: dependencias runtime directas, fijadas a versiones observadas en ese snapshot.
-- `requirements-test.txt`: FastAPI y pytest para ejecutar las pruebas unitarias aisladas.
+- `requirements-test.txt`: FastAPI, HTTPX y pytest para ejecutar las pruebas unitarias y de dependencia aisladas.
 - `python-version-ec2.txt`: Python 3.12.3, según la exportación recibida.
 
 El snapshot completo no es un archivo mínimo de instalación. No instalarlo automáticamente en producción sin revisar compatibilidad y necesidad de cada paquete.
@@ -50,7 +50,7 @@ La rama contiene cambios propuestos; `main` conserva el snapshot previo:
 - `GET /v1/recommendations` y `POST /v1/events` requieren `SHOPFAST_API_KEY`.
 - `GET /health/live` se mantiene público para comprobaciones de vida.
 - Se eliminó el decorador duplicado de `/api/recomendaciones` y se controla JSON inválido del motor interno.
-- Se añadieron cuatro pruebas unitarias del validador.
+- Se añadieron seis pruebas unitarias/de dependencia para el validador y la dependencia FastAPI.
 - Se agregó un archivo de dependencias runtime basado en versiones observadas en EC2.
 
 Para ejecutar las pruebas desde esta carpeta:
@@ -62,6 +62,6 @@ python -m pytest tests/test_security.py
 
 El servidor debe tener `SHOPFAST_API_KEY` en su archivo `.env` local no versionado. Nunca subir ese archivo ni la clave real.
 
-**Antes de desplegar:** el entorno de entrenamiento y el snapshot EC2 difieren en NumPy, pandas y joblib. Cargar el artefacto exacto y probar API/SageMaker en staging antes de aplicar los cambios en EC2. Las pruebas completas de integración no se ejecutaron porque los binarios del modelo y dataset no están versionados.
+**Validación runtime EC2 (27-11-2026):** se comprobó que el modelo y el ZIP del dataset cargan en la instancia; la inferencia local y SageMaker se ejecutaron correctamente con resultados coincidentes para tres entradas. API y Dashboard respondieron HTTP 200. Redis respondió PONG; RabbitMQ y el consumidor procesaron un evento nuevo, que quedó visible en Redis y elevó el contador del Dashboard de 7 a 8. Estos resultados corresponden al entorno EC2 existente, no al despliegue de esta rama.\n\n**Antes de desplegar esta rama:** probar las rutas protegidas con claves correctas e incorrectas, revisar los archivos y secretos efectivos, y confirmar que el Dashboard siga limitado a loopback o protegido por un mecanismo de acceso. El entorno de entrenamiento y EC2 difieren en NumPy, pandas y joblib; conservar esa diferencia documentada y validarla en un entorno controlado.
 
 Ver [auditoría de archivos EC2](../docs/post-entrega/revision-archivos-ec2.md), [brechas cloud pendientes](../docs/cloud-source-gap.md) y [revisión técnica](../docs/security-review.md).
