@@ -1,0 +1,2 @@
+# Herramientas de prueba presentes en el snapshot EC2.
+pytest==9.2.0
