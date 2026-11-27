@@ -10,10 +10,11 @@ import zipfile
 from fastapi.testclient import TestClient
 
 
-@pytest.fixture
-def api_runtime(monkeypatch):
-    """Load the real FastAPI routes while replacing AWS, RabbitMQ and model files."""
-    sys.modules.pop("api", None)
+@pytest.fixture(params=["api", "api_respaldo"])
+def api_runtime(monkeypatch, request):
+    """Load each real FastAPI app while replacing cloud services and model files."""
+    module_name = request.param
+    sys.modules.pop(module_name, None)
 
     published_events = []
 
@@ -32,10 +33,18 @@ def api_runtime(monkeypatch):
     )
     monkeypatch.setitem(sys.modules, "pika", pika)
 
+    class FakePipeline:
+        def predict_proba(self, frame):
+            import numpy as np
+            return np.array([[0.2, 0.8] for _ in range(len(frame))])
+
     monkeypatch.setattr(
         joblib,
         "load",
-        lambda _path: {"features": ["usuario", "contexto", "coincide"]},
+        lambda _path: {
+            "features": ["usuario", "contexto", "coincide"],
+            "pipeline": FakePipeline(),
+        },
     )
 
     class FakeArchive:
@@ -56,11 +65,11 @@ def api_runtime(monkeypatch):
     monkeypatch.setattr(zipfile, "ZipFile", lambda *_args, **_kwargs: FakeArchive())
     monkeypatch.setenv("SHOPFAST_API_KEY", "integration-test-key")
 
-    api = importlib.import_module("api")
+    api = importlib.import_module(module_name)
     try:
         yield api, published_events
     finally:
-        sys.modules.pop("api", None)
+        sys.modules.pop(module_name, None)
 
 
 @pytest.fixture
