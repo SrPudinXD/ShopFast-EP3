@@ -80,7 +80,7 @@ El código íntegro desplegado en `/home/ubuntu/shopfast` y el Dockerfile/compos
 - [Resumen de la entrega y resultados](docs/post-entrega/resumen-entrega.md)
 - [Guion para defensa y demostración](docs/post-entrega/guion-defensa.md)
 - [Pendientes y verificación posterior](docs/post-entrega/pendientes-y-verificacion.md)
-- [Manifiesto SHA-256 de los artefactos](docs/post-entrega/manifesto-artefactos.md)
+- [Manifiesto SHA-256 de los artefactos](docs/post-entrega/manifiesto-artefactos.md)
 - [Checklist de rúbrica](docs/rubrica-checklist.md)
 - [Índice de evidencias](docs/evidence-index.md)
 
