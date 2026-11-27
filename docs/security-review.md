@@ -66,6 +66,23 @@ La prueba de inferencia SageMaker comparó tres resultados con los resultados lo
 
 **Límite importante:** estas pruebas acreditan el funcionamiento observado del entorno EC2 existente y su flujo de inferencia/eventos. No prueban que los cambios de autenticación de `review/cloud-hardening` estén instalados en esa instancia. Tampoco sustituyen una prueba de autorización HTTP de las rutas protegidas, una comparación byte a byte de todos los archivos activos o una validación de despliegue de esta rama.
 
+
+## Validación HTTP de autenticación en EC2 — 27-11-2026
+
+Se inspeccionó el código activo de `api.py` y se comprobó que define `APIKeyHeader` para `X-API-Key`, obtiene el secreto desde `SHOPFAST_API_KEY`, utiliza `secrets.compare_digest` y protege las rutas de recomendaciones y eventos mediante la dependencia `verificar_api_key`. El health check permanece separado.
+
+Se ejecutaron tres solicitudes HTTP reales contra `GET /v1/recommendations` en la instancia EC2:
+
+| Escenario | Respuesta observada | Resultado |
+|---|---:|---|
+| Sin cabecera `X-API-Key` | HTTP 401 | Correcto |
+| Cabecera con clave incorrecta | HTTP 401 | Correcto |
+| Cabecera con clave configurada | HTTP 200 | Correcto |
+
+La clave se leyó localmente desde `.env`; no se imprimió ni se incorporó a Git.
+
+**Alcance:** esta prueba valida la autenticación de `GET /v1/recommendations` en el código que ya estaba desplegado en EC2. No valida todavía `POST /v1/events` por HTTP ni demuestra que los cambios de `review/cloud-hardening` estén desplegados. La rama contiene una implementación de seguridad separada; debe compararse y probarse contra el código activo antes de cualquier despliegue.
+
 ## Compatibilidad de dependencias y pendientes antes de despliegue
 
 El entorno de entrenamiento registra NumPy 2.3.5, pandas 2.2.3 y joblib 1.5.3. El snapshot de EC2 registra NumPy 2.5.5, pandas 3.1.1 y joblib 1.6.0. Scikit-learn aparece como 1.8.0 en ambos. El artefacto cargó y realizó inferencias en el entorno EC2 observado, pero esta diferencia de versiones debe mantenerse documentada y reproducirse en un entorno controlado.
