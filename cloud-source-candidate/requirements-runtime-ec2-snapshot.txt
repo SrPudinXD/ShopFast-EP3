@@ -1,0 +1,12 @@
+# Dependencias directas observadas en el snapshot pip freeze de EC2 (27-11-2026).
+# No incluye herramientas de pruebas ni el entorno completo.
+boto3==1.44.12
+fastapi==0.165.0
+joblib==1.6.0
+numpy==2.5.5
+pandas==3.1.1
+pika==1.5.0
+pydantic==2.14.4
+redis==8.2.0
+scikit-learn==1.8.0
+uvicorn==0.54.0
