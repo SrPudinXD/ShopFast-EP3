@@ -14,6 +14,3 @@ RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
-
-# Nota: dashboard_api.py no venia en los archivos exportados.
-# Esta unidad no se puede iniciar hasta recuperar ese modulo y sus recursos.
