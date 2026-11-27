@@ -38,7 +38,7 @@ Se ejecutaron seis pruebas unitarias y de dependencia aislada sobre el validador
 5. La dependencia FastAPI rechaza una petición sin cabecera → HTTP 401.
 6. La dependencia FastAPI acepta una petición con cabecera correcta → HTTP 200.
 
-**Workflow GitHub Actions:** se añadió `.github/workflows/tests.yml` para ejecutar `python -m pytest -q tests/test_security.py` en Python 3.12 en los eventos `push` de `main`/`review/cloud-hardening` y `pull_request` hacia `main`. La ejecución remota debe confirmarse en la pestaña Actions; añadir el workflow no equivale a una ejecución exitosa.
+**Workflow GitHub Actions:** se añadió `.github/workflows/tests.yml` para ejecutar `python -m pytest -q tests/test_security.py` en Python 3.12 en los eventos `push` de `main`/`review/cloud-hardening` y `pull_request` hacia `main`. Aún no se ha observado una ejecución remota para esta rama; el archivo está preparado, pero no debe presentarse como CI aprobado hasta que GitHub Actions muestre una ejecución exitosa. La ejecución local se realizó con las versiones indicadas arriba, no con las versiones fijadas en `requirements-test.txt`.
 
 **Resultado:** 6 pruebas aprobadas en el entorno local de revisión (Python 3.13.5, FastAPI 0.128.2, HTTPX 0.28.1 y pytest 9.0.2). El archivo `requirements-test.txt` fija FastAPI 0.165.0, HTTPX 0.28.1 y pytest 9.2.0 para el entorno de prueba previsto. Estas pruebas validan el helper y la dependencia en una aplicación FastAPI mínima; no son pruebas de integración de las rutas ShopFast ni acreditan que esta rama esté desplegada en EC2.
 
