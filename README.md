@@ -62,6 +62,15 @@ uvicorn api:app --host 127.0.0.1 --port 8000
 
 Swagger: http://127.0.0.1:8000/docs. No exponer a Internet. Este prototipo no incluye la autenticación, TLS, broker ni persistencia duradera de la aplicación cloud; sus pruebas son locales y no deben confundirse con la evidencia de EC2.
 
+Para construir la imagen local, primero copia `modelo.joblib` y `ShopFast_datos.zip` a `prototype-local/` (son artefactos locales ignorados por Git) y ejecuta:
+
+```bash
+docker build -t shopfast-local .
+docker run --rm -p 127.0.0.1:8000:8000 shopfast-local
+```
+
+La imagen escucha dentro del contenedor en el puerto 8000 y se publica solo en loopback del equipo anfitrión.
+
 ## Código cloud recuperado
 
 La carpeta `cloud-source-candidate/` contiene snapshots sanitizados de los archivos recibidos en `shopfast(1).rar`, `shopfast-configuracion.tar.gz` y `shopfast-dashboard-source.tar.gz`. El Dashboard incluye `dashboard_api.py` y sus recursos HTML/CSS/JS. También se recuperó la versión Python 3.12.3 y un `pip freeze` de 63 paquetes del entorno virtual completo de EC2.
