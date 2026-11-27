@@ -50,17 +50,17 @@ La rama contiene cambios propuestos; `main` conserva el snapshot previo:
 - `GET /v1/recommendations` y `POST /v1/events` requieren `SHOPFAST_API_KEY`.
 - `GET /health/live` se mantiene público para comprobaciones de vida.
 - Se eliminó el decorador duplicado de `/api/recomendaciones` y se controla JSON inválido del motor interno.
-- Se añadieron seis pruebas unitarias/de dependencia para el validador y la dependencia FastAPI.
+- Se añadieron pruebas unitarias del validador y pruebas de integración de las rutas FastAPI reales (`GET /v1/recommendations` y `POST /v1/events`), con AWS, RabbitMQ y artefactos del modelo aislados mediante dobles de prueba.
 - Se agregó un archivo de dependencias runtime basado en versiones observadas en EC2.
 
 Para ejecutar las pruebas desde esta carpeta:
 
 ```bash
 python -m pip install -r requirements-test.txt
-python -m pytest tests/test_security.py
+python -m pytest -q tests/
 ```
 
-El workflow `.github/workflows/tests.yml` ejecuta estas pruebas automáticamente en Python 3.12 al actualizar la rama o abrir/actualizar un Pull Request hacia `main`.
+El workflow `.github/workflows/tests.yml` ejecuta las pruebas unitarias y de integración automáticamente en Python 3.12 al actualizar la rama o abrir/actualizar un Pull Request hacia `main`.
 
 El servidor debe tener `SHOPFAST_API_KEY` en su archivo `.env` local no versionado. Nunca subir ese archivo ni la clave real.
 
