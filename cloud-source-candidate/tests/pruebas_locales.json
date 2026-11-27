@@ -1,0 +1,12 @@
+[
+  {"prueba": "HTTP 200 e inferencia real local", "resultado": "OK"},
+  {"prueba": "Solo inventario conocido", "resultado": "OK"},
+  {"prueba": "Limite solicitado", "resultado": "OK"},
+  {"prueba": "Limite invalido", "resultado": "OK"},
+  {"prueba": "Stock cero excluido", "resultado": "OK"},
+  {"prueba": "Revision antigua rechazada", "resultado": "OK"},
+  {"prueba": "Revision 42 conservada", "resultado": "OK"},
+  {"prueba": "Inventario vencido devuelve lista vacia", "resultado": "OK"},
+  {"prueba": "Usuario nuevo admitido", "resultado": "OK"},
+  {"prueba": "Health live", "resultado": "OK"}
+]
