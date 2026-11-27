@@ -87,7 +87,6 @@ def obtener_indicadores():
     }
 
 
-app.get("/api/recomendaciones")
 @app.get("/api/recomendaciones")
 def obtener_recomendaciones():
 
@@ -125,7 +124,7 @@ def obtener_recomendaciones():
 
         return datos
 
-    except (HTTPError, URLError, TimeoutError):
+    except (HTTPError, URLError, TimeoutError, ValueError):
         raise HTTPException(
             status_code=503,
             detail="Motor de recomendaciones no disponible"
