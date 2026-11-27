@@ -74,3 +74,6 @@ Ver [auditoría de archivos EC2](../docs/post-entrega/revision-archivos-ec2.md),
 ### Verificación del evento autorizado de seguridad
 
 El 27-11-2026 se probó `POST /v1/events` en el EC2 activo con tres casos de autenticación (HTTP 401 sin clave, HTTP 401 con clave incorrecta y HTTP 202 con clave válida). El evento autorizado, ID `bb713dc6-0923-4375-b71c-5cba51ae5a5c`, fue localizado en Redis mediante `EXISTS` (resultado 1) y `GET`; el mismo ID apareció en los logs del consumidor. El Dashboard mostró 9 eventos registrados y la interacción P17 igual a 9. Esta evidencia corresponde al entorno EC2 existente, no al despliegue de esta rama.
+
+
+**CI verificado (27-11-2026):** GitHub Actions ejecutó `python -m pytest -q tests/` en Python 3.12 y obtuvo 13 pruebas aprobadas (6 unitarias/de dependencia y 7 de integración de rutas). Las dependencias externas AWS/RabbitMQ y los artefactos del modelo se aislaron para esta suite; la ejecución no sustituye una prueba de despliegue en EC2.
