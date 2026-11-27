@@ -98,6 +98,7 @@ Ver [auditoría de archivos EC2](docs/post-entrega/revision-archivos-ec2.md), [d
 ## Revisión técnica propuesta
 
 - [Revisión de seguridad y compatibilidad cloud](docs/security-review.md)
+- [Workflow de pruebas automatizadas](.github/workflows/tests.yml) — ejecuta las pruebas de seguridad en Python 3.12 al abrir o actualizar un PR hacia `main`.
 
 La rama `review/cloud-hardening` contiene cambios propuestos y pruebas unitarias; `main` conserva el snapshot previo. No desplegar esa rama en EC2 sin completar las comprobaciones indicadas en la revisión.
 
