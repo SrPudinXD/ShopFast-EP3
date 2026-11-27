@@ -2,7 +2,7 @@
 
 ## 1. Apertura
 
-“ShopFast propone una arquitectura de recomendación para mostrar hasta diez productos en inicio y ficha. La solución combina un modelo de ranking, una API REST y servicios cloud. El objetivo de esta evaluación es demostrar el flujo técnico y reconocer qué resultados todavía no permiten una puesta en producción.”
+“ShopFast propone una arquitectura de recomendación para mostrar productos relevantes en inicio y ficha. La solución combina un modelo de ranking, una API REST y servicios cloud. El objetivo es demostrar el flujo técnico y reconocer qué resultados todavía no permiten una puesta en producción.”
 
 ## 2. Explicar la arquitectura
 
@@ -11,7 +11,7 @@
 3. La inferencia principal se realiza en SageMaker.
 4. Si la inferencia cloud falla, existe una ruta de respaldo local documentada.
 5. Los eventos se publican en RabbitMQ, los procesa un consumidor y se persisten en Redis.
-6. El dashboard consulta los eventos procesados.
+6. El Dashboard consulta los eventos procesados desde Redis y puede invocar el motor interno de recomendaciones.
 
 Aclaración importante: el inventario usado en el laboratorio es simulado. No existe reserva de stock ni integración comercial real.
 
@@ -36,7 +36,7 @@ Antes de comenzar, comprobar que la instancia esté activa y que la clave privad
 2. Mostrar Swagger mediante el túnel local.
 3. Ejecutar una solicitud de recomendación con un usuario de prueba.
 4. Explicar el modo de inferencia y la versión del modelo devueltos.
-5. Si está disponible el flujo de eventos, seguir un ID de prueba hasta el consumidor/Redis/dashboard.
+5. Si está disponible el flujo de eventos, seguir un ID de prueba hasta el consumidor/Redis/Dashboard.
 6. Mostrar una métrica del modelo y una métrica operativa, explicando sus diferencias.
 
 No presentar como demostración en vivo una captura histórica. Si un servicio no está disponible, decirlo y usar la evidencia registrada identificándola como evidencia previa.
@@ -45,6 +45,7 @@ No presentar como demostración en vivo una captura histórica. Si un servicio n
 
 - No publicar puertos internos de API, RabbitMQ o Redis directamente en Internet.
 - Mantener el acceso administrativo por SSH.
+- Mantener el Dashboard en loopback y acceder mediante túnel SSH; su ruta de indicadores no incorpora autenticación propia en el módulo recuperado.
 - Si el inventario no está verificado o está vencido, excluir el producto.
 - Si falla el recomendador, el checkout debe seguir disponible.
 - La recomendación es aplazar el lanzamiento general y limitarse a un piloto controlado.
@@ -63,6 +64,6 @@ No presentar como demostración en vivo una captura histórica. Si un servicio n
 
 **¿La arquitectura tiene alta disponibilidad multizona?** No está demostrada; EC2 y el endpoint constituyen puntos únicos de falla.
 
-**¿El repositorio contiene todo el código desplegado?** Contiene entrenamiento, prototipo local y una copia candidata sanitizada de la exportación EC2. No se ha verificado contra procesos activos y falta el dashboard.
+**¿El repositorio contiene el Dashboard?** Sí. Incluye el backend y los archivos HTML, CSS y JavaScript recuperados desde el directorio de trabajo de EC2 el 27-11-2026. Es un snapshot exportado, no una verificación del estado de procesos ya iniciados.
 
-**¿La API recibida valida una API Key?** No aparece esa validación en el módulo api.py recibido. Se debe comprobar si está en un proxy o middleware externo antes de afirmarlo.
+**¿La API recibida valida una API Key?** No aparece esa validación en el módulo `api.py` recibido. El Dashboard sí usa `SHOPFAST_API_KEY` al invocar el motor interno, pero eso no demuestra que las rutas de entrada de la API estén protegidas.
