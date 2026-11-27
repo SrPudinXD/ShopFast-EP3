@@ -83,6 +83,23 @@ La clave se leyó localmente desde `.env`; no se imprimió ni se incorporó a Gi
 
 **Alcance:** esta prueba valida la autenticación de `GET /v1/recommendations` en el código que ya estaba desplegado en EC2. No valida todavía `POST /v1/events` por HTTP ni demuestra que los cambios de `review/cloud-hardening` estén desplegados. La rama contiene una implementación de seguridad separada; debe compararse y probarse contra el código activo antes de cualquier despliegue.
 
+
+## Validación HTTP de autenticación de eventos en EC2 — 27-11-2026
+
+Se ejecutaron tres solicitudes HTTP reales a `POST /v1/events` con el mismo payload válido y distinto encabezado de autenticación:
+
+| Escenario | Respuesta observada | Resultado |
+|---|---:|---|
+| Sin cabecera `X-API-Key` | HTTP 401 | Correcto |
+| Cabecera con clave incorrecta | HTTP 401 | Correcto |
+| Cabecera con clave configurada | HTTP 202 | Correcto |
+
+La solicitud autorizada fue aceptada para publicación en RabbitMQ y devolvió el identificador `bb713dc6-0923-4375-b71c-5cba51ae5a5c`. La clave se leyó localmente desde `.env`; no se imprimió ni se incorporó al repositorio.
+
+En conjunto con las tres pruebas de `GET /v1/recommendations` documentadas anteriormente, hay seis escenarios HTTP correctos en el código desplegado en EC2: 401/401/200 para recomendaciones y 401/401/202 para eventos.
+
+**Alcance pendiente:** HTTP 202 confirma que la API aceptó el evento para publicación; por sí solo no demuestra que este evento específico ya haya sido consumido y persistido en Redis. Debe verificarse por separado. Estas pruebas corresponden al código activo en EC2 y no acreditan el despliegue de la rama `review/cloud-hardening`.
+
 ## Compatibilidad de dependencias y pendientes antes de despliegue
 
 El entorno de entrenamiento registra NumPy 2.3.5, pandas 2.2.3 y joblib 1.5.3. El snapshot de EC2 registra NumPy 2.5.5, pandas 3.1.1 y joblib 1.6.0. Scikit-learn aparece como 1.8.0 en ambos. El artefacto cargó y realizó inferencias en el entorno EC2 observado, pero esta diferencia de versiones debe mantenerse documentada y reproducirse en un entorno controlado.
