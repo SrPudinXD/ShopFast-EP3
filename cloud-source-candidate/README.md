@@ -62,8 +62,13 @@ python -m pytest tests/test_security.py
 
 El servidor debe tener `SHOPFAST_API_KEY` en su archivo `.env` local no versionado. Nunca subir ese archivo ni la clave real.
 
-**Validación runtime EC2 (27-11-2026):** se comprobó que el modelo y el ZIP del dataset cargan en la instancia; la inferencia local y SageMaker se ejecutaron correctamente con resultados coincidentes para tres entradas. API y Dashboard respondieron HTTP 200. Redis respondió PONG; RabbitMQ y el consumidor procesaron un evento nuevo, que quedó visible en Redis y elevó el contador del Dashboard de 7 a 8. Estos resultados corresponden al entorno EC2 existente, no al despliegue de esta rama.
+**Validación runtime EC2 (27-11-2026):** se comprobó que el modelo y el ZIP del dataset cargan en la instancia; la inferencia local y SageMaker se ejecutaron correctamente con resultados coincidentes para tres entradas. API y Dashboard respondieron HTTP 200. Redis respondió PONG; RabbitMQ y el consumidor procesaron un evento nuevo, que quedó visible en Redis y elevó el contador del Dashboard de 8 a 9. Estos resultados corresponden al entorno EC2 existente, no al despliegue de esta rama.
 
 **Antes de desplegar esta rama:** probar las rutas protegidas con claves correctas e incorrectas, revisar los archivos y secretos efectivos, y confirmar que el Dashboard siga limitado a loopback o protegido por un mecanismo de acceso. El entorno de entrenamiento y EC2 difieren en NumPy, pandas y joblib; conservar esa diferencia documentada y validarla en un entorno controlado.
 
 Ver [auditoría de archivos EC2](../docs/post-entrega/revision-archivos-ec2.md), [brechas cloud pendientes](../docs/cloud-source-gap.md) y [revisión técnica](../docs/security-review.md).
+
+
+### Verificación del evento autorizado de seguridad
+
+El 27-11-2026 se probó `POST /v1/events` en el EC2 activo con tres casos de autenticación (HTTP 401 sin clave, HTTP 401 con clave incorrecta y HTTP 202 con clave válida). El evento autorizado, ID `bb713dc6-0923-4375-b71c-5cba51ae5a5c`, fue localizado en Redis mediante `EXISTS` (resultado 1) y `GET`; el mismo ID apareció en los logs del consumidor. El Dashboard mostró 9 eventos registrados y la interacción P17 igual a 9. Esta evidencia corresponde al entorno EC2 existente, no al despliegue de esta rama.
