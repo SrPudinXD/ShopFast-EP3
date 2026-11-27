@@ -1,0 +1,17 @@
+[Unit]
+Description=ShopFast Consumidor de Eventos
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/shopfast
+EnvironmentFile=/home/ubuntu/shopfast/.env
+ExecStart=/home/ubuntu/shopfast/venv/bin/python -u consumidor.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
