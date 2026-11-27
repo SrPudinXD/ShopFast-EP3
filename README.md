@@ -35,7 +35,7 @@ Esta prueba es de baja concurrencia y loopback. No demuestra 250/750 req/s ni la
 - `prototype-local/`: API y pruebas del prototipo local.
 - `load-test/`: script y resultados Locust.
 - `docs/`: arquitectura, acceso AWS, brecha de código cloud, rúbrica y evidencias.
-- `docs/post-entrega/`: resumen de entrega, guion de defensa y checklist de pendientes.
+- `docs/post-entrega/`: resumen de entrega, guion de defensa, manifiesto de archivos y checklist de pendientes.
 - `Dockerfile`: construye el prototipo local, no la imagen original de EC2.
 - `docker-compose.yml`: servicios RabbitMQ/Redis para laboratorio local.
 
@@ -80,10 +80,11 @@ El código íntegro desplegado en `/home/ubuntu/shopfast` y el Dockerfile/compos
 - [Resumen de la entrega y resultados](docs/post-entrega/resumen-entrega.md)
 - [Guion para defensa y demostración](docs/post-entrega/guion-defensa.md)
 - [Pendientes y verificación posterior](docs/post-entrega/pendientes-y-verificacion.md)
+- [Manifiesto SHA-256 de los artefactos](docs/post-entrega/manifesto-artefactos.md)
 - [Checklist de rúbrica](docs/rubrica-checklist.md)
 - [Índice de evidencias](docs/evidence-index.md)
 
-Los PDF, DOCX, PPTX y ZIP de capturas se conservaron en el paquete de entrega compartido por AVA; no están versionados como binarios en este repositorio. El índice de evidencias describe su contenido y límites.
+Los PDF, DOCX, PPTX y ZIP de capturas se conservaron en el paquete de entrega compartido por AVA; no están versionados como binarios en este repositorio. El manifiesto permite verificar su integridad cuando se copien a un respaldo o release.
 
 ## Seguridad
 
