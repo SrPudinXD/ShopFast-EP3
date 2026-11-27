@@ -1,25 +1,22 @@
-# Checklist rúbrica EP3 AS IA
+# Revisión de rúbrica EP3 AS IA
 
-Estados según informe, anexo y evidencias disponibles; parcial/pendiente no equivale a cumplimiento completo.
-
-| Criterio | Peso | Estado documentado |
-|---|---:|---|
-| IE1 modelo cloud y endpoint | 10% | Demostrado en laboratorio; E42/E47/E94 |
-| IE2 integración empresarial e interpretabilidad | 10% | Parcial: falta conciliación integral ID/versión/filtro/dashboard |
-| IE4 SageMaker, escalabilidad y costos | 5% | Parcial: Locust de 10 usuarios; no demuestra 250/750 req/s |
-| IE5 infraestructura, modelo, dataset y dashboard | 5% | Demostrado en laboratorio; inventario simulado |
-| IE7 REST, interoperabilidad y seguridad | 10% | Parcial: TLS directo y rate limiting de producción no acreditados |
-| IE10 pruebas funcionales y rendimiento | 10% | Parcial: matriz retrospectiva y Locust; faltan pruebas automatizadas reproducibles |
-| IE3 defensa de estrategia | 10% | Pendiente de defensa |
-| E6 defensa AIaaS, costo y flexibilidad | 10% | Pendiente de defensa |
-| IE8 defensa de arquitectura | 5% | Pendiente de defensa |
-| IE9 demostración en vivo | 5% | Pendiente de demostración |
-| IE11 validación y optimización | 5% | Pendiente de defensa |
-| IE12 lenguaje técnico | 5% | Pendiente de defensa |
-| IE13 respuestas al docente | 10% | Pendiente de defensa |
+| Criterio | Peso | Estado | Observación |
+|---|---:|---|---|
+| IE1 — Modelo cloud con endpoint consumible | 10% | Demostrado en laboratorio | E42/E47 y E94 muestran inferencia cloud y HTTP 200. |
+| IE2 — Integración empresarial e interpretabilidad | 10% | Parcial | API y dashboard existen; falta conciliación integral del mismo ID, versión, filtrado y estado visible. |
+| IE4 — SageMaker, escalabilidad y costos | 5% | Parcial | Hay estimación de costos y Locust de baja concurrencia; no se demuestra 250/750 req/s. |
+| IE5 — Infraestructura mínima, modelo, dataset y dashboard | 5% | Demostrado en laboratorio | EC2, modelo, dataset y dashboard documentados; inventario simulado. |
+| IE7 — REST, interoperabilidad y seguridad | 10% | Parcial | API Key, IAM y SSH restringido; TLS directo y rate limiting de producción no acreditados. |
+| IE10 — Pruebas funcionales y rendimiento | 10% | Parcial | Matriz de 12 casos y Locust controlado; faltan pruebas automatizadas reproducibles con commit, entrada y aserción previa. |
+| IE3 — Defensa de despliegue y decisión empresarial | 10% | Pendiente | Se evalúa en defensa. |
+| E6 — Defensa de plataforma AIaaS, rendimiento, costo y flexibilidad | 10% | Pendiente | Distinguir medición propia, tarifa de referencia y proyección. |
+| IE8 — Defensa de integración y arquitectura | 5% | Pendiente | Explicar SageMaker, fallback, broker y Redis. |
+| IE9 — Demostración en vivo | 5% | Pendiente | Requiere predicción nueva, invocación real y traza hasta dashboard/consumidor. |
+| IE11 — Validación y optimización | 5% | Pendiente | Explicar selección por NDCG@10 y límites de carga. |
+| IE12 — Lenguaje técnico y formal | 5% | Pendiente | Se evalúa durante exposición. |
+| IE13 — Respuestas al docente | 10% | Pendiente | No se certifica solo con documentos. |
 
 ## Brechas reconocidas
-Contrato móvil; caso formal de frontera; rollback de artefacto incompatible; estrés a capacidad objetivo; conciliación endpoint/dashboard; TLS y rate limiting; RPO de zona no demostrable; código exacto cloud y Dockerfile original no recuperados.
+Contrato móvil, caso formal de frontera, rollback de artefacto incompatible, prueba de estrés, conciliación endpoint-dashboard, TLS directo, rate limiting, RPO de zona y código exacto del despliegue AWS.
 
-## Locust
-10 usuarios, spawn 2 usuarios/s, 60 s, loopback en EC2. CSV: 382 solicitudes, 0 fallos, 6,47 req/s, promedio 37,7 ms, P95 45 ms, P99 110 ms, máximo 161 ms. No afirmar 250/750 req/s.
+Locust: 10 usuarios, incremento 2 usuarios/s, 60 s, loopback en EC2. CSV: 382 solicitudes, 0 fallos, 6,47 req/s, promedio 37,7 ms, P95 45 ms, P99 110 ms, máximo 161 ms. No afirmar validación de 250/750 req/s.

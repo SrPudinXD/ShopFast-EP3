@@ -1,18 +1,11 @@
-# Brecha del código fuente cloud
+# Brecha de código fuente cloud
 
-## Archivos fuente verificados
-- ShopFast_EP3_API_LOCAL.zip: api.py, probar.py, modelo.joblib y ShopFast_datos.zip.
-- ShopFast_EP3_modelo.zip: entrenar.py, metricas.csv, modelo.joblib y datos.
-- Informe ARC42, presentación, script Locust, métricas y capturas sanitizadas.
+El paquete seguro contiene ShopFast_EP3_API_LOCAL.zip (prototipo local con api.py, probar.py, modelo.joblib y datos) y ShopFast_EP3_modelo.zip (entrenar.py, metricas.csv, modelo.joblib y datos), además de informe, presentación, Locust y capturas.
 
-El LEEME del paquete API local declara que no contiene autenticación, TLS, broker ni persistencia duradera; no es el código completo desplegado en AWS.
+El LEEME de la API local advierte que no incluye autenticación, TLS, broker ni persistencia duradera y que no es el código completo desplegado en AWS.
 
-## No se recibió como fuente íntegra
-El directorio EC2 /home/ubuntu/shopfast no fue entregado como ZIP o conjunto completo de archivos. Las capturas muestran operaciones y fragmentos, pero no permiten reconstruir de forma confiable todos los módulos. No se inventa ni se presenta el prototipo local como cloud.
+El directorio /home/ubuntu/shopfast no fue entregado como ZIP ni como conjunto íntegro de archivos fuente. Las capturas permiten verificar operaciones y fragmentos, pero no reconstruir confiablemente todos los archivos. No se etiqueta el prototipo local como versión cloud.
 
-Para cerrar esta brecha se requiere recuperar desde la instancia/respaldo, sanitizar y revisar: api.py cloud, sagemaker_cliente.py, consumidor.py, dashboard_api.py, dashboard/index.html, styles.css, app.js, Dockerfile/compose original, unidad systemd, requirements/lockfile y configuración no secreta.
+Para cerrar esta brecha, incorporar desde EC2 o respaldo original, sanitizando primero: api.py cloud, sagemaker_cliente.py, consumidor.py, dashboard_api.py, dashboard/index.html, styles.css, app.js, Dockerfile/compose original, unidad systemd, requirements/lockfile, instrucciones de despliegue y commit/hash.
 
-Antes de copiar: excluir .env, API Keys, contraseñas, PEM y credenciales; revisar logs e historial; rotar cualquier clave expuesta; registrar commit y versión del modelo correspondiente a E93–E97.
-
-## Estado
-Pendiente. El Dockerfile de la raíz construye solo el prototipo local, no el contenedor original de AWS.
+Excluir .env, API Keys, contraseñas, claves PEM, credenciales AWS y tokens. Revisar logs e historial y rotar cualquier clave expuesta. El Dockerfile raíz de este repositorio construye solo el prototipo local; no es el Dockerfile original de AWS.
