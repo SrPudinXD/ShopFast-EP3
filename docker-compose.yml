@@ -1,0 +1,23 @@
+# Servicios locales de laboratorio, no el compose original EC2.
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: shopfast-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-shopfast}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?Define RABBITMQ_DEFAULT_PASS en .env local}
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes: [rabbitmq_data:/var/lib/rabbitmq]
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    container_name: shopfast-redis
+    command: ["redis-server","--appendonly","yes"]
+    ports: ["127.0.0.1:6379:6379"]
+    volumes: [redis_data:/data]
+    restart: unless-stopped
+volumes:
+  rabbitmq_data:
+  redis_data:
