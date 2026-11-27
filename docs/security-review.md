@@ -40,7 +40,7 @@ Se ejecutaron seis pruebas unitarias y de dependencia aislada sobre el validador
 
 **Resultado:** 6 pruebas aprobadas en el entorno local de revisión (Python 3.13.5, FastAPI 0.128.2 y pytest 9.0.2). Esto valida el helper y la dependencia en una app FastAPI mínima; no es una prueba integrada de los módulos ShopFast en Python 3.12.3 de EC2.
 
-No se ejecutó la aplicación cloud completa ni una prueba integrada con SageMaker, Redis o RabbitMQ. Los binarios de modelo y dataset no están versionados, y no se verificó el estado actual de EC2.
+Las pruebas se ejecutaron en el entorno disponible (Python 3.13.5, FastAPI 0.128.2, HTTPX 0.28.1 y pytest 9.0.2). El archivo de pruebas fija FastAPI 0.165.0, HTTPX 0.28.1 y pytest 9.2.0 para el entorno de prueba previsto. No se ejecutó la aplicación cloud completa ni una prueba integrada con SageMaker, Redis o RabbitMQ. Los binarios de modelo y dataset no están versionados, y no se verificó el estado actual de EC2.
 
 ## Compatibilidad de dependencias
 
@@ -64,5 +64,5 @@ No actualizar producción directamente desde esta rama sin completar estas compr
 - `cloud-source-candidate/dashboard_api.py`
 - `cloud-source-candidate/env.example`
 - `cloud-source-candidate/requirements-runtime-ec2-snapshot.txt`
-- `cloud-source-candidate/requirements-test.txt`
+- `cloud-source-candidate/requirements-test.txt` (FastAPI, HTTPX y pytest)
 - `cloud-source-candidate/tests/test_security.py`
