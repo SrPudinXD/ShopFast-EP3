@@ -60,6 +60,8 @@ python -m pip install -r requirements-test.txt
 python -m pytest tests/test_security.py
 ```
 
+El workflow `.github/workflows/tests.yml` ejecuta estas pruebas automáticamente en Python 3.12 al actualizar la rama o abrir/actualizar un Pull Request hacia `main`.
+
 El servidor debe tener `SHOPFAST_API_KEY` en su archivo `.env` local no versionado. Nunca subir ese archivo ni la clave real.
 
 **Validación runtime EC2 (27-11-2026):** se comprobó que el modelo y el ZIP del dataset cargan en la instancia; la inferencia local y SageMaker se ejecutaron correctamente con resultados coincidentes para tres entradas. API y Dashboard respondieron HTTP 200. Redis respondió PONG; RabbitMQ y el consumidor procesaron un evento nuevo, que quedó visible en Redis y elevó el contador del Dashboard de 8 a 9. Estos resultados corresponden al entorno EC2 existente, no al despliegue de esta rama.
