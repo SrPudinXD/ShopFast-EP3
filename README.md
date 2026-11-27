@@ -33,7 +33,7 @@ Esta prueba es de baja concurrencia y loopback. No demuestra 250/750 req/s ni la
 
 - `model/`: entrenamiento, dependencias y métricas.
 - `prototype-local/`: API y pruebas del prototipo local.
-- `cloud-source-candidate/`: copia candidata sanitizada de la API con SageMaker, cliente Boto3, RabbitMQ, consumidor Redis, handler de inferencia, pruebas y unidades systemd recibidas después.
+- `cloud-source-candidate/`: snapshots sanitizados de la API con SageMaker, RabbitMQ/Redis, Dashboard FastAPI y frontend, unidades systemd, dependencias EC2 y pruebas.
 - `load-test/`: script y resultados Locust.
 - `docs/`: arquitectura, acceso AWS, brecha de código cloud, rúbrica y evidencias.
 - `docs/post-entrega/`: resumen de entrega, guion de defensa, manifiesto de archivos, auditoría de archivos EC2 y checklist de pendientes.
@@ -66,11 +66,11 @@ Swagger: http://127.0.0.1:8000/docs. No exponer a Internet. Este prototipo no in
 
 ## Código cloud candidato
 
-La carpeta `cloud-source-candidate/` contiene los fuentes recibidos en `shopfast(1).rar` y las unidades systemd de `shopfast-configuracion.tar.gz`, revisados y sanitizados. Se retiraron contraseñas incrustadas y se trasladó la configuración de conexión a variables de entorno.
+La carpeta `cloud-source-candidate/` contiene fuentes sanitizadas recibidas en `shopfast(1).rar`, unidades systemd de `shopfast-configuracion.tar.gz` y el Dashboard exportado directamente desde el directorio de trabajo de EC2 el 27-11-2026. Incluye `dashboard_api.py`, HTML/CSS/JS, la salida de `systemctl cat`, Python 3.12.3 y un `pip freeze` de 63 paquetes del entorno virtual completo.
 
-**No equivale a un despliegue verificado:** falta `dashboard_api.py` y sus recursos estáticos; la API Key no aparece implementada en el `api.py` recibido; las versiones exactas de Boto3/Pika/Redis no venían en el paquete; y no se compararon los archivos con procesos activos de EC2. Los binarios de modelo/datos, el volcado Redis y los archivos `.pyc` no se publicaron.
+**No equivale todavía a un despliegue verificado y reproducible:** falta el Dockerfile original de EC2; el `pip freeze` es un snapshot del entorno completo, no un requirements mínimo; no se compararon los hashes de todos los archivos con los procesos cargados en memoria; la API candidata no muestra autenticación propia de sus rutas de entrada; el Dashboard usa `SHOPFAST_API_KEY` para llamar al motor interno, pero `/api/dashboard` no incorpora autenticación propia. Los binarios de modelo/datos, el volcado Redis, `.env`, claves PEM y archivos `.pyc` no se publicaron.
 
-Ver [auditoría de archivos EC2](docs/post-entrega/revision-archivos-ec2.md), [brecha restante](docs/cloud-source-gap.md) y [arquitectura](docs/architecture.md).
+Ver [auditoría de archivos EC2](docs/post-entrega/revision-archivos-ec2.md), [documentación del Dashboard recuperado](cloud-source-candidate/dashboard/README.md), [brecha restante](docs/cloud-source-gap.md) y [arquitectura](docs/architecture.md).
 
 ## Documentación de entrega y defensa
 
