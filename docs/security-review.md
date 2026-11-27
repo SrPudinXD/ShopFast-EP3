@@ -100,6 +100,19 @@ En conjunto con las tres pruebas de `GET /v1/recommendations` documentadas anter
 
 **Alcance pendiente:** HTTP 202 confirma que la API aceptó el evento para publicación; por sí solo no demuestra que este evento específico ya haya sido consumido y persistido en Redis. Debe verificarse por separado. Estas pruebas corresponden al código activo en EC2 y no acreditan el despliegue de la rama `review/cloud-hardening`.
 
+
+## Confirmación de persistencia del evento autorizado — 27-11-2026
+
+Se verificó el evento enviado por `POST /v1/events` después de recibir HTTP 202:
+
+- Identificador: `bb713dc6-0923-4375-b71c-5cba51ae5a5c`.
+- Redis: `EXISTS evento:web:<event_id>` devolvió `1`.
+- Redis `GET`: devolvió el JSON del evento, incluyendo `source=web`, `type=click`, `subject_ref=U7`, `product_id=P17` y `recommendation_id=prueba-seguridad-eventos`.
+- Logs del consumidor: se encontró el mismo `event_id` en el registro del proceso.
+- Dashboard: `eventos_registrados=9`, `redis=true`, `dashboard=operativo` e interacción de producto P17 igual a 9.
+
+Esta comprobación completa la evidencia del evento específico: aceptación HTTP → procesamiento del consumidor → persistencia en Redis → actualización del contador del Dashboard. El resultado describe el entorno EC2 que estaba ejecutándose el 27-11-2026; no significa que la rama de revisión haya sido desplegada.
+
 ## Compatibilidad de dependencias y pendientes antes de despliegue
 
 El entorno de entrenamiento registra NumPy 2.3.5, pandas 2.2.3 y joblib 1.5.3. El snapshot de EC2 registra NumPy 2.5.5, pandas 3.1.1 y joblib 1.6.0. Scikit-learn aparece como 1.8.0 en ambos. El artefacto cargó y realizó inferencias en el entorno EC2 observado, pero esta diferencia de versiones debe mantenerse documentada y reproducirse en un entorno controlado.
