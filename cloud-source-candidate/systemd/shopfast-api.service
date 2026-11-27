@@ -1,0 +1,17 @@
+[Unit]
+Description=ShopFast FastAPI
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/shopfast
+EnvironmentFile=/home/ubuntu/shopfast/.env
+ExecStart=/home/ubuntu/shopfast/venv/bin/python -u -m uvicorn api:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
