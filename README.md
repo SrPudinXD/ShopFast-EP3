@@ -98,11 +98,11 @@ Ver [auditoría de archivos EC2](docs/post-entrega/revision-archivos-ec2.md), [d
 ## Documentación de entrega y defensa
 
 - [Resumen de entrega y resultados](docs/post-entrega/resumen-entrega.md)
-- [Guion para defensa y demostración](docs/post-entrega/guion-defensa.md)
+- [Defensa y demostración](docs/post-entrega/guion-defensa.md)
 - [Auditoría de los archivos EC2](docs/post-entrega/revision-archivos-ec2.md)
 - [Pendientes y verificación posterior](docs/post-entrega/pendientes-y-verificacion.md)
 - [Manifiesto SHA-256 de artefactos](docs/post-entrega/manifiesto-artefactos.md)
-- [Checklist de rúbrica](docs/rubrica-checklist.md)
+- [Checklist](docs/rubrica-checklist.md)
 - [Índice de evidencias](docs/evidence-index.md)
 - [Acceso seguro al laboratorio AWS](docs/acceso-aws.md)
 
