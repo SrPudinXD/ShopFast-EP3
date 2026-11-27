@@ -1,0 +1,8 @@
+# Dependencias del requirements.txt exportado
+-r requirements-exported.txt
+
+# Imports requeridos por la API cloud, RabbitMQ y el consumidor Redis.
+# Versiones exactas de EC2 no venian en el paquete; fijarlas tras pip freeze.
+boto3
+pika
+redis
