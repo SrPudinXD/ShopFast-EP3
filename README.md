@@ -33,9 +33,10 @@ Esta prueba es de baja concurrencia y loopback. No demuestra 250/750 req/s ni la
 
 - `model/`: entrenamiento, dependencias y métricas.
 - `prototype-local/`: API y pruebas del prototipo local.
+- `cloud-source-candidate/`: copia candidata sanitizada de la API con SageMaker, cliente Boto3, RabbitMQ, consumidor Redis, handler de inferencia, pruebas y unidades systemd recibidas después.
 - `load-test/`: script y resultados Locust.
 - `docs/`: arquitectura, acceso AWS, brecha de código cloud, rúbrica y evidencias.
-- `docs/post-entrega/`: resumen de entrega, guion de defensa, manifiesto de archivos y checklist de pendientes.
+- `docs/post-entrega/`: resumen de entrega, guion de defensa, manifiesto de archivos, auditoría de archivos EC2 y checklist de pendientes.
 - `Dockerfile`: construye el prototipo local, no la imagen original de EC2.
 - `docker-compose.yml`: servicios RabbitMQ/Redis para laboratorio local.
 
@@ -63,22 +64,19 @@ uvicorn api:app --host 127.0.0.1 --port 8000
 
 Swagger: http://127.0.0.1:8000/docs. No exponer a Internet. Este prototipo no incluye la autenticación, TLS, broker ni persistencia duradera de la aplicación cloud; sus pruebas son locales y no deben confundirse con la evidencia de EC2.
 
-## Arquitectura cloud documentada
+## Código cloud candidato
 
-Cliente → API FastAPI → validación/autorización → filtro de inventario vigente → SageMaker → ranking → respuesta JSON. La ruta de respaldo local está documentada para fallas de inferencia.
+La carpeta `cloud-source-candidate/` contiene los fuentes recibidos en `shopfast(1).rar` y las unidades systemd de `shopfast-configuracion.tar.gz`, revisados y sanitizados. Se retiraron contraseñas incrustadas y se trasladó la configuración de conexión a variables de entorno.
 
-Eventos → RabbitMQ → consumidor → deduplicación → Redis → dashboard. EC2 usa IAM/Boto3 para invocar SageMaker; S3 conserva el artefacto y CloudWatch observa los servicios. El acceso administrativo se realiza por túnel SSH; API y dashboard se mantienen en loopback.
+**No equivale a un despliegue verificado:** falta `dashboard_api.py` y sus recursos estáticos; la API Key no aparece implementada en el `api.py` recibido; las versiones exactas de Boto3/Pika/Redis no venían en el paquete; y no se compararon los archivos con procesos activos de EC2. Los binarios de modelo/datos, el volcado Redis y los archivos `.pyc` no se publicaron.
 
-No hay alta disponibilidad multizona demostrada. Ver [arquitectura](docs/architecture.md) y [acceso seguro](docs/acceso-aws.md).
-
-## Brecha de código fuente cloud
-
-El código íntegro desplegado en `/home/ubuntu/shopfast` y el Dockerfile/compose original de EC2 no están incluidos en este repositorio. El Dockerfile raíz corresponde solo al prototipo local. No presentar el prototipo como código cloud. Para cerrar la brecha, exportar la fuente real desde EC2 o el respaldo original y sanitizarla antes de publicarla. Ver [detalle de la brecha](docs/cloud-source-gap.md).
+Ver [auditoría de archivos EC2](docs/post-entrega/revision-archivos-ec2.md), [brecha restante](docs/cloud-source-gap.md) y [arquitectura](docs/architecture.md).
 
 ## Documentación de entrega y defensa
 
 - [Resumen de la entrega y resultados](docs/post-entrega/resumen-entrega.md)
 - [Guion para defensa y demostración](docs/post-entrega/guion-defensa.md)
+- [Auditoría de los archivos EC2 recibidos](docs/post-entrega/revision-archivos-ec2.md)
 - [Pendientes y verificación posterior](docs/post-entrega/pendientes-y-verificacion.md)
 - [Manifiesto SHA-256 de los artefactos](docs/post-entrega/manifiesto-artefactos.md)
 - [Checklist de rúbrica](docs/rubrica-checklist.md)
@@ -88,8 +86,8 @@ Los PDF, DOCX, PPTX y ZIP de capturas se conservaron en el paquete de entrega co
 
 ## Seguridad
 
-No publicar `.env`, API Keys, claves PEM, contraseñas, tokens, credenciales AWS ni logs que los contengan. Una captura con API Key fue excluida del paquete sanitizado; si la clave estuvo activa o fue expuesta por otro medio, rotarla. No publicar puertos internos de API, RabbitMQ o Redis directamente en Internet.
+No publicar `.env`, API Keys, claves PEM, contraseñas, tokens, credenciales AWS ni logs que los contengan. No publicar puertos internos de API, RabbitMQ o Redis directamente en Internet. Si las credenciales de prueba que aparecían en el RAR original se utilizaron en EC2, rotarlas.
 
 ## Decisión
 
-Se recomienda aplazar el lanzamiento general y permitir únicamente un piloto controlado con inventario vigente. No afirmar como demostrados: impacto causal en ventas, 250/750 req/s, alta disponibilidad multizona, TLS directo, rate limiting de producción ni código cloud íntegro.
+Se recomienda aplazar el lanzamiento general y permitir únicamente un piloto controlado con inventario vigente. No afirmar como demostrados: impacto causal en ventas, 250/750 req/s, alta disponibilidad multizona, TLS directo, rate limiting de producción, autenticación API Key en la copia recibida ni despliegue cloud reproducible de extremo a extremo.
