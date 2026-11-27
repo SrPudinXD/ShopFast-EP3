@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   security-tests:
-    name: Security unit tests (Python 3.12)
+    name: API and security tests (Python 3.12)
     runs-on: ubuntu-latest
     defaults:
       run:
