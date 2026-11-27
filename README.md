@@ -47,7 +47,13 @@ pip install -r model/requirements.txt
 python model/entrenar.py
 ```
 
-El script genera métricas, el artefacto `modelo.joblib` y gráficos de validación/prueba. Los datos y artefactos binarios no se versionan en este repositorio; revisar [model/SHA256.txt](model/SHA256.txt) para los hashes de los CSV originales.
+El script genera métricas, el artefacto `model/modelo.joblib` y gráficos de validación/prueba. Los datos y artefactos binarios no se versionan en este repositorio; revisar [model/SHA256.txt](model/SHA256.txt) para los hashes de los CSV originales.
+
+Para ejecutar el prototipo local con ese resultado, copia el dataset y el modelo a su carpeta (no se suben a Git):
+```bash
+cp model/ShopFast_datos.zip prototype-local/ShopFast_datos.zip
+cp model/modelo.joblib prototype-local/modelo.joblib
+```
 
 ## Servicios locales de laboratorio
 
