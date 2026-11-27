@@ -2,9 +2,9 @@
 
 ## Alcance
 
-Esta revisión se realizó sobre los snapshots sanitizados de API, Dashboard, unidades systemd, configuración y dependencias recuperados desde EC2. Los cambios se mantienen en la rama `review/cloud-hardening`; la rama `main` conserva el snapshot previo para no confundir correcciones propuestas con código que estaba desplegado.
+Esta revisión se realizó sobre los snapshots sanitizados de API, Dashboard, unidades systemd, configuración y dependencias recuperados desde EC2. Los cambios de endurecimiento se mantienen en la rama `review/cloud-hardening`; la rama `main` conserva el snapshot previo para distinguir las correcciones propuestas del código recuperado.
 
-## Hallazgos y correcciones
+## Hallazgos y correcciones propuestas
 
 | Hallazgo en el snapshot | Riesgo o efecto | Corrección propuesta |
 |---|---|---|
@@ -27,7 +27,7 @@ Esta revisión se realizó sobre los snapshots sanitizados de API, Dashboard, un
 
 La ruta `GET /api/dashboard` del Dashboard no tiene autenticación propia en el código revisado. Debe permanecer enlazada a `127.0.0.1` y accesible solo mediante el túnel SSH autorizado; no publicarla directamente.
 
-## Pruebas realizadas
+## Pruebas automatizadas de la rama
 
 Se ejecutaron seis pruebas unitarias y de dependencia aislada sobre el validador de clave:
 
@@ -38,23 +38,46 @@ Se ejecutaron seis pruebas unitarias y de dependencia aislada sobre el validador
 5. La dependencia FastAPI rechaza una petición sin cabecera → HTTP 401.
 6. La dependencia FastAPI acepta una petición con cabecera correcta → HTTP 200.
 
-**Resultado:** 6 pruebas aprobadas en el entorno local de revisión (Python 3.13.5, FastAPI 0.128.2 y pytest 9.0.2). Esto valida el helper y la dependencia en una app FastAPI mínima; no es una prueba integrada de los módulos ShopFast en Python 3.12.3 de EC2.
+**Resultado:** 6 pruebas aprobadas en el entorno local de revisión (Python 3.13.5, FastAPI 0.128.2, HTTPX 0.28.1 y pytest 9.0.2). El archivo `requirements-test.txt` fija FastAPI 0.165.0, HTTPX 0.28.1 y pytest 9.2.0 para el entorno de prueba previsto. Estas pruebas validan el helper y la dependencia en una aplicación FastAPI mínima; no son pruebas de integración de las rutas ShopFast ni acreditan que esta rama esté desplegada en EC2.
 
-Las pruebas se ejecutaron en el entorno disponible (Python 3.13.5, FastAPI 0.128.2, HTTPX 0.28.1 y pytest 9.0.2). El archivo de pruebas fija FastAPI 0.165.0, HTTPX 0.28.1 y pytest 9.2.0 para el entorno de prueba previsto. No se ejecutó la aplicación cloud completa ni una prueba integrada con SageMaker, Redis o RabbitMQ. Los binarios de modelo y dataset no están versionados, y no se verificó el estado actual de EC2.
+## Validación runtime observada en EC2 — 27-11-2026
 
-## Compatibilidad de dependencias
+Las siguientes comprobaciones se ejecutaron sobre la instancia EC2 existente, antes de desplegar las modificaciones de esta rama:
 
-El entorno de entrenamiento registra NumPy 2.3.5, pandas 2.2.3 y joblib 1.5.3. El snapshot de EC2 registra NumPy 2.5.5, pandas 3.1.1 y joblib 1.6.0. Scikit-learn aparece como 1.8.0 en ambos.
+| Componente o prueba | Resultado observado |
+|---|---|
+| Python del entorno virtual | 3.12.3 |
+| NumPy / pandas / joblib / scikit-learn | 2.5.5 / 3.1.1 / 1.6.0 / 1.8.0 |
+| `pip check` | Sin dependencias rotas |
+| `modelo.joblib` | Carga correcta; pipeline Random Forest y 6 características |
+| `ShopFast_datos.zip` | ZIP íntegro; `catalogo.csv` e `impresiones.csv` presentes |
+| Inferencia local | 5 predicciones ejecutadas sin error |
+| SageMaker | Endpoint `shopfast-endpoint-v1` en `InService`, región `us-east-2` |
+| Inferencia SageMaker | 3 predicciones correctas; coincidieron con los resultados locales para las mismas entradas |
+| API | `GET /health/live` devolvió HTTP 200 |
+| Dashboard | `GET /api/dashboard` devolvió HTTP 200 |
+| Redis | `PING` respondió `PONG`; claves `evento:*` detectadas |
+| RabbitMQ | Diagnóstico de conexión correcto; cola `shopfast.events` |
+| Consumidor | Servicio systemd activo; 1 consumidor; al finalizar, 0 mensajes ready y 0 unacknowledged |
+| Flujo de evento | Publicación controlada confirmada por RabbitMQ; el consumidor persistió el evento en Redis |
+| Dashboard después de la prueba | 8 eventos registrados, `redis: true`, `dashboard: operativo` e interacción de producto P17 actualizada a 8 |
 
-Antes de desplegar:
-- Cargar el artefacto `modelo.joblib` exacto con el entorno objetivo.
-- Ejecutar la API con el dataset real en una instancia de staging.
-- Comprobar inferencia local y SageMaker.
-- Probar acceso autorizado y rechazo de claves incorrectas.
-- Verificar el flujo de evento hasta Redis y Dashboard.
+La prueba de inferencia SageMaker comparó tres resultados con los resultados locales correspondientes: P1 0.1189, P2 0.0591 y P3 0.0565. La prueba de mensajería publicó un evento de identificador único; el script comprobó su existencia en Redis y el Dashboard mostró el contador incrementado de 7 a 8.
+
+**Límite importante:** estas pruebas acreditan el funcionamiento observado del entorno EC2 existente y su flujo de inferencia/eventos. No prueban que los cambios de autenticación de `review/cloud-hardening` estén instalados en esa instancia. Tampoco sustituyen una prueba de autorización HTTP de las rutas protegidas, una comparación byte a byte de todos los archivos activos o una validación de despliegue de esta rama.
+
+## Compatibilidad de dependencias y pendientes antes de despliegue
+
+El entorno de entrenamiento registra NumPy 2.3.5, pandas 2.2.3 y joblib 1.5.3. El snapshot de EC2 registra NumPy 2.5.5, pandas 3.1.1 y joblib 1.6.0. Scikit-learn aparece como 1.8.0 en ambos. El artefacto cargó y realizó inferencias en el entorno EC2 observado, pero esta diferencia de versiones debe mantenerse documentada y reproducirse en un entorno controlado.
+
+Antes de desplegar la rama:
+- Probar las rutas protegidas de la API con clave correcta, ausente e incorrecta.
 - Comparar los archivos desplegados con el commit aprobado.
+- Confirmar que el Dashboard siga limitado a loopback o protegido por un mecanismo de acceso.
+- Revisar la configuración de secretos fuera de Git.
+- Validar el comportamiento con la versión de Python y dependencias que se usarán en el despliegue.
 
-No actualizar producción directamente desde esta rama sin completar estas comprobaciones.
+No actualizar producción directamente desde esta rama sin completar estas comprobaciones. La rama `main` no se modifica con esta propuesta.
 
 ## Archivos de la rama
 
@@ -64,5 +87,5 @@ No actualizar producción directamente desde esta rama sin completar estas compr
 - `cloud-source-candidate/dashboard_api.py`
 - `cloud-source-candidate/env.example`
 - `cloud-source-candidate/requirements-runtime-ec2-snapshot.txt`
-- `cloud-source-candidate/requirements-test.txt` (FastAPI, HTTPX y pytest)
+- `cloud-source-candidate/requirements-test.txt`
 - `cloud-source-candidate/tests/test_security.py`
