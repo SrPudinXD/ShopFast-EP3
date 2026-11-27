@@ -18,8 +18,9 @@ La versión enviada a AVA se consolidó en estos artefactos:
 | Evidencias recientes | E93–E97 | Reinicio de API, inferencia cloud y prueba Locust |
 | Código de entrenamiento | ZIP / fuente | Preparación de datos, entrenamiento, métricas y artefacto del modelo |
 | Prototipo local | ZIP / fuente | API local y pruebas del prototipo |
+| Código cloud candidato | Fuente Python / configuración | API SageMaker, RabbitMQ, consumidor Redis y unidades systemd recibidas después |
 
-Los PDF, DOCX, PPTX y ZIP de evidencias forman parte del paquete de entrega compartido por separado. Este repositorio contiene el código de entrenamiento, métricas, prototipo local y documentación; no debe suponerse que todos los binarios del paquete AVA están publicados aquí.
+Los PDF, DOCX, PPTX y ZIP de evidencias forman parte del paquete de entrega compartido por separado. El repositorio contiene el código de entrenamiento, prototipo local, documentación y una copia candidata sanitizada del código cloud recibido.
 
 ## 2. Resultado del modelo
 
@@ -78,10 +79,12 @@ La recomendación documentada es aplazar el lanzamiento general y mantener, como
 - disponibilidad continua a partir de una captura puntual;
 - que el prototipo local sea el mismo código desplegado en EC2.
 
-## 6. Brecha de código cloud
+## 6. Estado del código cloud recibido
 
-El repositorio no contiene el conjunto íntegro de fuentes que corre en `/home/ubuntu/shopfast` ni el Dockerfile/compose original de EC2. Las capturas permiten documentar operaciones, pero no reconstruir confiablemente los archivos ausentes.
+Se recibieron `shopfast(1).rar` y `shopfast-configuracion.tar.gz`. La revisión permitió publicar una copia candidata y sanitizada en [cloud-source-candidate/](../cloud-source-candidate/), separada del prototipo local.
 
-Para cerrar la brecha se debe exportar desde EC2 o desde el respaldo original, revisar y sanitizar antes de publicar: API cloud, cliente SageMaker, consumidor, dashboard, unidad systemd, dependencias, Dockerfile/compose y guía de despliegue. Excluir siempre `.env`, API Keys, claves PEM, contraseñas, tokens, credenciales AWS y logs que los contengan.
+La exportación incluye API con llamada a SageMaker y fallback local, cliente Boto3, mensajería RabbitMQ, consumidor Redis, productores de prueba, handler SageMaker y unidades systemd. Se retiraron contraseñas incrustadas y no se publicaron el volcado Redis, archivos bytecode ni binarios de modelo/datos.
 
-Ver también: [brecha de código cloud](../cloud-source-gap.md), [índice de evidencias](../evidence-index.md), [checklist de rúbrica](../rubrica-checklist.md) y [guion de defensa](guion-defensa.md).
+Quedan brechas: no se recibió `dashboard_api.py` ni sus recursos estáticos; la API Key no aparece implementada en el `api.py` recibido; faltan versiones exactas de Boto3/Pika/Redis y no hay comparación de hashes contra el proceso activo de EC2. Por tanto, esta carpeta es código cloud candidato, no una prueba de despliegue verificado.
+
+Ver [auditoría de archivos EC2](revision-archivos-ec2.md), [brecha de código cloud](../cloud-source-gap.md), [índice de evidencias](../evidence-index.md), [checklist de rúbrica](../rubrica-checklist.md) y [guion de defensa](guion-defensa.md).
