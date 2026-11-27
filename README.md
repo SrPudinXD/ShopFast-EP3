@@ -6,7 +6,7 @@
 
 ## Resumen
 
-ShopFast propone un recomendador de productos con Random Forest, FastAPI, AWS SageMaker y EC2. El flujo de eventos utiliza RabbitMQ, un consumidor y Redis; el dashboard consulta los eventos procesados.
+ShopFast propone un recomendador de productos con Random Forest, FastAPI, AWS SageMaker y EC2. El flujo de eventos utiliza RabbitMQ, un consumidor y Redis; el Dashboard consulta los eventos procesados.
 
 **Límite esencial:** el inventario usado en el laboratorio es simulado. No existe integración comercial ni reserva de stock. El checkout debe continuar funcionando si falla el recomendador.
 
@@ -29,16 +29,14 @@ Locust: 10 usuarios, incremento 2 usuarios/s, 60 s, contra `127.0.0.1:8000` desd
 
 Esta prueba es de baja concurrencia y loopback. No demuestra 250/750 req/s ni latencia desde Internet. Ver [resultados Locust](load-test/Resultados_Locust_LEER.md).
 
-## Estructura
+## Estructura del repositorio
 
-- `model/`: entrenamiento, dependencias y métricas.
+- `model/`: entrenamiento, dependencias, métricas y hashes del dataset.
 - `prototype-local/`: API y pruebas del prototipo local.
-- `cloud-source-candidate/`: snapshots sanitizados de la API con SageMaker, RabbitMQ/Redis, Dashboard FastAPI y frontend, unidades systemd, dependencias EC2 y pruebas.
+- `cloud-source-candidate/`: snapshot sanitizado de API cloud, SageMaker, RabbitMQ/Redis, Dashboard, unidades systemd y entorno EC2.
 - `load-test/`: script y resultados Locust.
-- `docs/`: arquitectura, acceso AWS, brecha de código cloud, rúbrica y evidencias.
-- `docs/post-entrega/`: resumen de entrega, guion de defensa, manifiesto de archivos, auditoría de archivos EC2 y checklist de pendientes.
-- `Dockerfile`: construye el prototipo local, no la imagen original de EC2.
-- `docker-compose.yml`: servicios RabbitMQ/Redis para laboratorio local.
+- `docs/`: arquitectura, acceso AWS, evidencias, rúbrica y documentación de entrega.
+- `Dockerfile` y `docker-compose.yml` de la raíz: entorno de laboratorio local, no despliegue original de EC2.
 
 ## Reproducir entrenamiento
 
@@ -49,7 +47,7 @@ pip install -r model/requirements.txt
 python model/entrenar.py
 ```
 
-El script genera `metricas.csv`, el artefacto `modelo.joblib` y gráficos de validación/prueba. Para el prototipo local, copiar `modelo.joblib` y `ShopFast_datos.zip` a `prototype-local/`.
+El script genera métricas, el artefacto `modelo.joblib` y gráficos de validación/prueba. Los datos y artefactos binarios no se versionan en este repositorio; revisar [model/SHA256.txt](model/SHA256.txt) para los hashes de los CSV originales.
 
 ## Ejecutar prototipo local
 
@@ -64,23 +62,24 @@ uvicorn api:app --host 127.0.0.1 --port 8000
 
 Swagger: http://127.0.0.1:8000/docs. No exponer a Internet. Este prototipo no incluye la autenticación, TLS, broker ni persistencia duradera de la aplicación cloud; sus pruebas son locales y no deben confundirse con la evidencia de EC2.
 
-## Código cloud candidato
+## Código cloud recuperado
 
-La carpeta `cloud-source-candidate/` contiene fuentes sanitizadas recibidas en `shopfast(1).rar`, unidades systemd de `shopfast-configuracion.tar.gz` y el Dashboard exportado directamente desde el directorio de trabajo de EC2 el 27-11-2026. Incluye `dashboard_api.py`, HTML/CSS/JS, la salida de `systemctl cat`, Python 3.12.3 y un `pip freeze` de 63 paquetes del entorno virtual completo.
+La carpeta `cloud-source-candidate/` contiene snapshots sanitizados de los archivos recibidos en `shopfast(1).rar`, `shopfast-configuracion.tar.gz` y `shopfast-dashboard-source.tar.gz`. El Dashboard incluye `dashboard_api.py` y sus recursos HTML/CSS/JS. También se recuperó la versión Python 3.12.3 y un `pip freeze` de 63 paquetes del entorno virtual completo de EC2.
 
-**No equivale todavía a un despliegue verificado y reproducible:** falta el Dockerfile original de EC2; el `pip freeze` es un snapshot del entorno completo, no un requirements mínimo; no se compararon los hashes de todos los archivos con los procesos cargados en memoria; la API candidata no muestra autenticación propia de sus rutas de entrada; el Dashboard usa `SHOPFAST_API_KEY` para llamar al motor interno, pero `/api/dashboard` no incorpora autenticación propia. Los binarios de modelo/datos, el volcado Redis, `.env`, claves PEM y archivos `.pyc` no se publicaron.
+**No equivale a un despliegue verificado y reproducible:** falta el Dockerfile original de EC2; el `pip freeze` es un snapshot del entorno completo, no un requirements mínimo; no se compararon los hashes de todos los archivos con procesos activos; la API candidata no muestra autenticación propia de sus rutas de entrada; y la ruta `/api/dashboard` no incorpora autenticación propia. El Dashboard usa `SHOPFAST_API_KEY` para llamar al motor interno, pero esa protección no se extiende automáticamente a todas las rutas. Los binarios de modelo/datos, el volcado Redis, `.env`, claves PEM y archivos `.pyc` no se publicaron.
 
-Ver [auditoría de archivos EC2](docs/post-entrega/revision-archivos-ec2.md), [documentación del Dashboard recuperado](cloud-source-candidate/dashboard/README.md), [brecha restante](docs/cloud-source-gap.md) y [arquitectura](docs/architecture.md).
+Ver [auditoría de archivos EC2](docs/post-entrega/revision-archivos-ec2.md), [documentación del Dashboard](cloud-source-candidate/dashboard/README.md), [brechas cloud pendientes](docs/cloud-source-gap.md) y [arquitectura](docs/architecture.md).
 
 ## Documentación de entrega y defensa
 
-- [Resumen de la entrega y resultados](docs/post-entrega/resumen-entrega.md)
+- [Resumen de entrega y resultados](docs/post-entrega/resumen-entrega.md)
 - [Guion para defensa y demostración](docs/post-entrega/guion-defensa.md)
-- [Auditoría de los archivos EC2 recibidos](docs/post-entrega/revision-archivos-ec2.md)
+- [Auditoría de los archivos EC2](docs/post-entrega/revision-archivos-ec2.md)
 - [Pendientes y verificación posterior](docs/post-entrega/pendientes-y-verificacion.md)
-- [Manifiesto SHA-256 de los artefactos](docs/post-entrega/manifiesto-artefactos.md)
+- [Manifiesto SHA-256 de artefactos](docs/post-entrega/manifiesto-artefactos.md)
 - [Checklist de rúbrica](docs/rubrica-checklist.md)
 - [Índice de evidencias](docs/evidence-index.md)
+- [Acceso seguro al laboratorio AWS](docs/acceso-aws.md)
 
 Los PDF, DOCX, PPTX y ZIP de capturas se conservaron en el paquete de entrega compartido por AVA; no están versionados como binarios en este repositorio. El manifiesto permite verificar su integridad cuando se copien a un respaldo o release.
 
