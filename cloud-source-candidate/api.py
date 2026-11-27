@@ -1,6 +1,6 @@
 from sagemaker_cliente import predecir_aws
 from pydantic import BaseModel
-from fastapi import HTTPException, FastAPI, Query
+from fastapi import HTTPException, FastAPI, Query, Depends
 from datetime import datetime
 from mensajeria import publicar_evento
 import pika
@@ -12,6 +12,7 @@ import zipfile
 import joblib
 import pandas as pd
 from typing import Literal
+from security import require_api_key
 
 ROOT = Path(__file__).resolve().parent
 artifact = joblib.load(ROOT / "modelo.joblib")
@@ -134,6 +135,7 @@ def get_recommendations(
     context: Literal["audio", "video", "redes", "movil"] = "audio",
     limit: int = Query(10, ge=1, le=10),
     surface: Literal["home", "product"] = "home",
+    _auth: None = Depends(require_api_key),
 ):
     result = recommendations(subject_ref, context, limit, time())
     result["surface"] = surface
@@ -152,7 +154,7 @@ class Evento(BaseModel):
 
 
 @app.post("/v1/events", status_code=202)
-def registrar_evento(evento: Evento):
+def registrar_evento(evento: Evento, _auth: None = Depends(require_api_key)):
     try:
         publicar_evento(evento.model_dump(mode="json"))
         return {
