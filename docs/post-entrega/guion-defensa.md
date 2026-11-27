@@ -63,4 +63,6 @@ No presentar como demostración en vivo una captura histórica. Si un servicio n
 
 **¿La arquitectura tiene alta disponibilidad multizona?** No está demostrada; EC2 y el endpoint constituyen puntos únicos de falla.
 
-**¿El repositorio contiene todo el código desplegado?** No. Contiene el entrenamiento y el prototipo local, pero falta exportar el código íntegro de EC2 y su configuración original.
+**¿El repositorio contiene todo el código desplegado?** Contiene entrenamiento, prototipo local y una copia candidata sanitizada de la exportación EC2. No se ha verificado contra procesos activos y falta el dashboard.
+
+**¿La API recibida valida una API Key?** No aparece esa validación en el módulo api.py recibido. Se debe comprobar si está en un proxy o middleware externo antes de afirmarlo.
