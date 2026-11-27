@@ -27,6 +27,18 @@ Incluye tres unidades systemd:
 
 También contiene `redis-dump.rdb`, que es estado runtime y no fuente de aplicación.
 
+### `shopfast-dashboard-source.tar.gz` — exportado desde EC2 el 27-11-2026
+
+Incluye:
+
+- `dashboard_api.py`
+- `dashboard/index.html`
+- `dashboard/app.js`
+- `dashboard/styles.css`
+- `requirements-ec2-freeze.txt`
+- `python-version.txt`
+- `systemd/dashboard-service.txt`, salida de `systemctl cat`
+
 ## Resultados de revisión
 
 | Comprobación | Resultado |
@@ -39,11 +51,14 @@ También contiene `redis-dump.rdb`, que es estado runtime y no fuente de aplicac
 | Publicación RabbitMQ y confirmación durable | Presente en `mensajeria.py` |
 | Deduplicación Redis antes del ACK | Presente en `consumidor.py` |
 | Prueba de interrupción antes del ACK | Presente en consumidor de recuperación |
-| Fuente del dashboard | Ausente |
-| Dockerfile original de EC2 | Ausente |
-| Archivo `.env` / versiones completas de entorno | Ausentes |
+| Dashboard backend y frontend | Recuperados desde el directorio de trabajo de EC2 |
+| Sintaxis de `dashboard_api.py` | Análisis AST correcto |
+| Versión Python EC2 | 3.12.3 |
+| Snapshot de dependencias EC2 | `pip freeze` de 63 paquetes |
+| Dockerfile original de EC2 | No recibido |
+| Archivo `.env` | No recibido ni publicado |
 
-El análisis sintáctico no equivale a ejecutar la aplicación ni a probar conexiones AWS/RabbitMQ/Redis.
+El análisis sintáctico no equivale a ejecutar la aplicación ni a probar conexiones AWS/RabbitMQ/Redis. La exportación se copió desde el directorio configurado por systemd; no se comparó el hash de cada archivo con el código cargado en memoria por procesos ya iniciados.
 
 ## Hallazgos técnicos
 
@@ -52,11 +67,13 @@ El análisis sintáctico no equivale a ejecutar la aplicación ni a probar conex
 3. La ruta `POST /v1/events` publica a RabbitMQ. El consumidor almacena por clave `evento:{source}:{event_id}` con `SET NX`, y confirma el mensaje después de guardar.
 4. El consumidor de recuperación termina intencionalmente antes del ACK para forzar reentrega; es un instrumento de prueba, no el consumidor normal.
 5. El productor de prueba se actualizó en la copia publicada para incluir `recommendation_id`, campo requerido por el esquema de evento de la API.
-6. El código recibido no muestra autenticación API Key. La documentación del sistema menciona esa protección, pero no se encontró en el módulo API exportado.
-7. El servicio systemd del dashboard arranca `dashboard_api:app`, pero el archivo no está en el RAR.
-8. El requirements exportado no declara los paquetes `boto3`, `pika` y `redis`, aunque el código los importa. Se agregó una lista cloud candidata; faltan las versiones exactas instaladas en EC2.
-9. El Compose recibido contiene un secreto de prueba incrustado. La copia pública lo reemplaza por variables de entorno obligatorias. Si el secreto original se utilizó en el entorno activo, debe rotarse.
-10. No se encontró Dockerfile en los paquetes recibidos. El Compose incluido solo define RabbitMQ y Redis; no es el despliegue completo de la API.
+6. La API candidata recibida no muestra autenticación API Key para sus rutas de entrada. El Dashboard, por su parte, exige `SHOPFAST_API_KEY` para invocar el endpoint interno de recomendaciones y la transmite en una cabecera servidor-a-servidor. La ruta `/api/dashboard` no incorpora autenticación propia en este módulo.
+7. El servicio systemd del dashboard arranca `dashboard_api:app`. El backend y los recursos estáticos ya fueron recuperados.
+8. El RAR no declaraba todos los paquetes importados por la aplicación cloud. El `pip freeze` posterior de EC2 recuperó las versiones instaladas del entorno completo, pero no es una lista mínima de dependencias ni una receta de instalación aislada.
+9. El Compose recibido contenía un secreto de prueba incrustado. La copia pública lo reemplaza por variables de entorno obligatorias. Si el secreto original se utilizó en el entorno activo, debe rotarse.
+10. No se encontró Dockerfile original en los paquetes recibidos. El Compose incluido solo define RabbitMQ y Redis; no es el despliegue completo de la API.
+11. El Dashboard llama al endpoint interno con parámetros fijos de demostración (`U7`, contexto `audio`, límite 5, superficie `home`). Para una integración real debe recibir contexto validado y autorizado, no asumir un usuario fijo.
+12. El endpoint de indicadores recorre las claves Redis que coinciden con `evento:*` y construye agregados en memoria en cada petición. Es suficiente para el volumen de laboratorio observado, pero requiere revisión si crece el número de eventos.
 
 ## Decisiones de publicación
 
@@ -66,15 +83,14 @@ Se excluyeron:
 - credenciales y valores secretos;
 - `.pyc` / `__pycache__`;
 - `redis-dump.rdb` por contener eventos runtime;
-- `modelo.joblib`, `model.tar.gz` y `ShopFast_datos.zip`, ya ignorados por el repositorio como artefactos binarios/datos.
-
-El paquete de datos se verificó internamente, pero su publicación no es necesaria para incorporar la fuente Python. El artefacto de modelo puede recuperarse/reproducirse siguiendo las instrucciones de entrenamiento y los controles de integridad ya documentados.
+- `modelo.joblib`, `model.tar.gz` y `ShopFast_datos.zip`, ya ignorados por el repositorio como artefactos binarios/datos;
+- el archivo `.env` y cualquier clave PEM.
 
 ## Pendientes para declarar el despliegue reproducible
 
-- Obtener dashboard backend y frontend.
-- Confirmar autenticación en API, proxy o capa externa.
-- Obtener `pip freeze` del entorno virtual EC2.
-- Comparar hashes de los archivos publicados con los de EC2.
-- Recuperar el Dockerfile y configuración de despliegue de la aplicación, si existen.
-- Ejecutar pruebas integradas autorizadas en un entorno controlado.
+- Recuperar Dockerfile y configuración completa de despliegue, si existen.
+- Confirmar autenticación de todas las rutas accesibles y el límite de confianza del túnel SSH.
+- Definir un requirements mínimo reproducible separado del `pip freeze` histórico.
+- Comparar hashes de los archivos publicados con los de EC2 en una nueva exportación controlada.
+- Ejecutar pruebas integradas autorizadas de API, SageMaker, RabbitMQ, Redis y Dashboard.
+- Verificar el manejo de errores del frontend ante respuestas incompletas del motor.
